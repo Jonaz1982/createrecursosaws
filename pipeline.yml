@@ -1,0 +1,31 @@
+name: Setup-TF-Backend-$(Date:yyyyMMdd)$(Rev:.r)
+
+trigger: none
+
+pool:
+  vmImage: "ubuntu-latest"
+
+stages:
+  - stage: SetupBackend
+    displayName: "🚀 Crear Backend Terraform en AWS"
+    jobs:
+      - job: DeployBackend
+        displayName: "🛠️ Crear bucket y tabla para backend remoto"
+        steps:
+          - task: TerraformInstaller@1
+            displayName: "📦 Instalar Terraform"
+            inputs:
+              terraformVersion: 'latest'
+
+          - task: AWSCLI@1
+            displayName: "🔐 Configurar AWS CLI"
+            inputs:
+              awsCredentials: "aws-terraform-prueba-eks"
+              regionName: "us-east-1"
+              command: "version"
+
+          - script: |
+              terraform init
+              terraform apply -auto-approve
+            workingDirectory: "$(System.DefaultWorkingDirectory)/backend-terraform"
+            displayName: "🚀 Crear recursos de backend remoto"
