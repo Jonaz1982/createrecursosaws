@@ -17,12 +17,16 @@ stages:
             inputs:
               terraformVersion: 'latest'
 
-          - task: AWSCLI@1
-            displayName: "🔐 Configurar AWS CLI"
-            inputs:
-              awsCredentials: "aws-terraform-prueba-eks"
-              regionName: "us-east-1"
-              command: "version"
+          - script: |
+              echo "🔐 Configurando AWS CLI con variables de entorno"
+              aws configure set aws_access_key_id $AWS_ACCESS_KEY_ID
+              aws configure set aws_secret_access_key $AWS_SECRET_ACCESS_KEY
+              aws configure set region us-east-1
+              aws sts get-caller-identity
+            displayName: "🪪 Configurar credenciales AWS"
+            env:
+              AWS_ACCESS_KEY_ID: $(AWS_ACCESS_KEY_ID)
+              AWS_SECRET_ACCESS_KEY: $(AWS_SECRET_ACCESS_KEY)
 
           - script: |
               terraform init
